@@ -1,0 +1,12 @@
+.DS_Store
+Thumbs.db
+*.icloud
+
+# scratch prototypes, not part of the published site
+demo/
+
+# personal scratch notes, not published
+todo.md
+
+# personal codebase notes, not published
+CODEBASE.md

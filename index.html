@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="google-site-verification" content="s0MoPGJ8fGh2OheDAHnR9hZtDEpL3i1bCaE3k0fl8Gs" />
+<title>Wonjun Choi</title>
+<meta name="description" content="Wonjun Choi — M.S. student at Korea University, DAIS Lab. Research on adaptive intelligence and lifelong learning AI systems.">
+<meta name="keywords" content="Wonjun Choi, LLM, agent, adaptive AI, lifelong learning, data mining, NLP, Korea University, DAIS Lab">
+<meta name="author" content="Wonjun Choi">
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="Wonjun Choi">
+<meta property="og:description" content="M.S. student at Korea University, DAIS Lab. Adaptive intelligence and lifelong learning AI systems.">
+<meta property="og:url" content="https://wonjunchoi23.github.io/">
+<meta property="og:image" content="https://wonjunchoi23.github.io/images/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="canonical" href="https://wonjunchoi23.github.io/">
+<link rel="icon" type="image/png" sizes="512x512" href="images/favicon.png">
+<link rel="apple-touch-icon" href="images/favicon.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,400&family=Source+Serif+4:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* palette follows the DAIS Lab site (dais-ku.github.io) */
+    --bg: #fafcfb;
+    --bg-rgb: 250, 252, 251;
+    --bg-2: #e9f0ef;
+    --surface: #f3f7f4;
+    --fg: #141715;
+    --fg-2: #39413c;
+    --muted: #5f6a64;
+    --muted-light: #808b85;
+    --muted-faint: #aab2ad;   /* ongoing / de-emphasised work */
+
+    /* how opaque the centre column is over the graph (1 = fully solid) */
+    --sheet-alpha: .87;
+    --accent: #5e917e;
+    --accent-light: #a7c1a8;
+    --accent-dark: #50645b;
+    --award: #7ea896;         /* paler sage for the Best Paper label */
+    --accent-pale: #d4ddd6;
+    --border: #ccd6d0;
+
+    /* KU crimson (PANTONE 202 C, #790030) mixed 35% into --fg — used only for
+       the school name in Education, a subtle brand tint over near-black. */
+    --school: #370f1e;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: "Lato", Verdana, Helvetica, "Pretendard", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.55;
+  }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+  a { color: inherit; }
+
+  /* the graph lives behind everything, always running */
+  #bg { position: fixed; inset: 0; width: 100%; height: 100%; display: block; z-index: 0; }
+
+  .vignette {
+    position: fixed; inset: 0; pointer-events: none; z-index: 1;
+    background: radial-gradient(135% 95% at 50% 42%, transparent 48%, var(--bg-2) 100%);
+    mix-blend-mode: multiply;
+    opacity: .32;
+  }
+
+  /* ---------- brand: the hero that collapses into a pinned header ---------- *
+   * One element does both jobs. At the top of the page it is the full-screen
+   * hero; as you scroll it shrinks and settles into a compact bar, so the name
+   * never disappears and About picks up directly underneath it. Every value
+   * that changes is driven from JS off a single 0→1 scroll progress.          */
+  .brand {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 6;
+    display: flex; flex-direction: column; align-items: center;
+    text-align: center;
+    padding: 0 clamp(20px, 5vw, 40px);
+    pointer-events: none;
+  }
+  .brand > * { pointer-events: auto; }
+
+  .name {
+    margin: 0;
+    font-size: 74px;          /* JS-driven */
+    font-weight: 300;         /* constant — the name keeps its weight as it shrinks */
+    letter-spacing: -3.8px;   /* JS-driven */
+    line-height: 1.04;
+    white-space: nowrap;
+  }
+
+  /* affiliation, rule and tagline — folded away as the header collapses */
+  .brand-extra { overflow: hidden; width: 100%; }
+
+  .affil {
+    margin: 20px 0 0;
+    font-size: 13.5px; font-weight: 500;
+    letter-spacing: .2em; text-transform: uppercase;
+    color: var(--muted);
+  }
+  .affil em { font-style: normal; color: var(--accent); }
+  .affil a { color: inherit; text-decoration: none; transition: color .2s; }
+  .affil a:hover { color: var(--accent); }
+  .affil-logo { width: 15px; height: 15px; border-radius: 4px; margin: -3px 5px -3px 0; vertical-align: middle; }
+
+  .rule { width: 44px; height: 1px; margin: 20px auto 0; background: var(--accent); }
+
+  .tagline {
+    margin: 20px auto 0;
+    max-width: 64ch;
+    font-size: clamp(.83rem, 1.22vw, .93rem);
+    font-weight: 400; line-height: 1.68;
+    color: var(--fg-2);
+  }
+  /* research line under the role — a step smaller and quieter */
+  .tagline-sub { display: block; font-size: .93em; font-style: italic; color: var(--muted); }
+
+  .links {
+    margin-top: 30px;
+    display: flex; gap: 6px; justify-content: center; flex-wrap: wrap;
+    transform-origin: center top;
+  }
+  .links a {
+    display: grid; place-items: center;
+    width: 50px; height: 50px; border-radius: 999px;
+    color: var(--fg-2);
+    transition: color .2s, background .2s, transform .2s;
+  }
+  .links a:hover { color: var(--accent); background: var(--surface); transform: translateY(-2px); }
+  .links svg { width: 28px; height: 28px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+
+  /* The pinned name's own backdrop — sized to the collapsed header, so it only
+     ever paints behind it, never over the full-height hero. Deliberately has
+     no bottom rule: it should read as the page continuing, not as a toolbar.
+     Slightly more solid than the sheet so text sliding under doesn't ghost. */
+  .bar-bg {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 5;
+    height: 80px;              /* JS-driven */
+    /* fades out over its last stretch rather than ending on a hard edge —
+       a clean horizontal cut across the page is what reads as a toolbar */
+    background: linear-gradient(to bottom,
+      rgba(var(--bg-rgb), calc(var(--sheet-alpha) + .06)) 0,
+      rgba(var(--bg-rgb), calc(var(--sheet-alpha) + .06)) calc(100% - 30px),
+      rgba(var(--bg-rgb), 0) 100%);
+    opacity: 0;                /* JS-driven */
+    pointer-events: none;
+  }
+
+  .hero-spacer { height: 100svh; }
+
+  .scroll-hint {
+    position: fixed; z-index: 6; left: 50%; bottom: 34px; transform: translateX(-50%);
+    font-size: 10px; letter-spacing: .28em; text-transform: uppercase; color: var(--muted);
+    text-decoration: none;
+    transition: color .2s;
+  }
+  .scroll-hint:hover { color: var(--accent); }
+  .scroll-hint i { display: block; width: 1px; height: 30px; margin: 10px auto 0; background: linear-gradient(var(--muted), transparent); }
+
+  .intro { opacity: 0; animation: rise 1s cubic-bezier(.22,.9,.3,1) forwards; }
+  .name.intro { animation-delay: .1s; }
+  .brand-extra.intro { animation-delay: .26s; }
+  .links.intro { animation-delay: .42s; }
+  .scroll-hint.intro { animation-delay: .9s; }
+  @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+  /* the hint is already translated for centring, so it only fades */
+  @keyframes riseX { from { opacity: 0 } to { opacity: 1 } }
+  .scroll-hint.intro { animation-name: riseX; }
+
+  /* ---------- the centre column ---------- *
+   * Opaque under the text so the graph never shows through it, but with its
+   * left and right edges feathered out rather than cut, so it dissolves into
+   * the background instead of sitting on it like a card.                     */
+  .sheet {
+    --pad: clamp(30px, 6vw, 96px);
+    --feather: calc(var(--pad) * .85);
+    position: relative; z-index: 3;
+    max-width: 980px; margin: 0 auto;
+    padding: 0 var(--pad);
+    background: linear-gradient(to right,
+      rgba(var(--bg-rgb), 0) 0,
+      rgba(var(--bg-rgb), var(--sheet-alpha)) var(--feather),
+      rgba(var(--bg-rgb), var(--sheet-alpha)) calc(100% - var(--feather)),
+      rgba(var(--bg-rgb), 0) 100%);
+  }
+  /* same feather, faded in vertically, so the top edge blends too */
+  .sheet::before {
+    content: ""; position: absolute; left: 0; right: 0; top: -200px; height: 200px;
+    background: inherit;
+    -webkit-mask-image: linear-gradient(to bottom, transparent, #000);
+            mask-image: linear-gradient(to bottom, transparent, #000);
+    pointer-events: none;
+  }
+
+  /* no rules between sections — spacing alone carries the separation */
+  section { padding: clamp(23px, 3.1vh, 37px) 0; }
+  section:first-child { padding-top: clamp(20px, 2.5vh, 31px); }
+
+  h2 {
+    margin: 0 0 18px;
+    font-size: 10px; font-weight: 600;
+    letter-spacing: .26em; text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .lead { margin: 0 0 12px; font-size: .88rem; font-weight: 400; line-height: 1.7; color: var(--fg-2); }
+  .lead:last-of-type { margin-bottom: 0; }
+  /* links sit a step heavier than their surrounding text */
+  .lead a, .news a {
+    color: var(--accent-dark); font-weight: 500; text-decoration: none;
+    border-bottom: 1px solid var(--accent-pale);
+    transition: border-color .2s, color .2s;
+  }
+  .lead a:hover, .news a:hover { color: var(--accent); border-color: var(--accent); }
+  /* news links that should read as plain text: no rule at rest or on hover,
+     only a colour shift to show they are clickable */
+  .news a.bare {
+    color: inherit; font-weight: inherit; border-bottom: 0;
+    transition: color .2s;
+  }
+  .news a.bare:hover { color: var(--accent); }
+
+  /* education links (school name + department) follow the publication title:
+     no visible underline at rest, a soft accent hint on hover */
+  .entry a {
+    color: inherit; font-weight: inherit; text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: color .2s, border-color .2s;
+  }
+  .entry a:hover { color: var(--accent); border-bottom-color: var(--accent-pale); }
+
+  /* about: portrait left, text right */
+  .about-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 123px) minmax(0, 1fr);
+    gap: clamp(24px, 3.6vw, 46px);
+    align-items: center;
+  }
+  .portrait { margin: 0; }
+  /* feathered to nothing at the edges so the photo sits in the page rather
+     than on it — same idea as the sheet's edges */
+  .portrait img {
+    display: block; width: 100%;
+    aspect-ratio: 1 / 1.16;
+    object-fit: cover; object-position: center 28%;
+    border-radius: 14px;   /* gently rounded corners under the soft edge fade */
+    -webkit-mask-image: radial-gradient(ellipse 94% 89% at 50% 43%, #000 74%, rgba(0,0,0,0) 100%);
+            mask-image: radial-gradient(ellipse 94% 89% at 50% 43%, #000 74%, rgba(0,0,0,0) 100%);
+  }
+  .portrait-ph {
+    aspect-ratio: 1 / 1.16;
+    display: grid; place-items: center; text-align: center; padding: 20px;
+    font-size: 11.5px; line-height: 1.7; color: var(--muted-light);
+    border: 1px dashed var(--border); border-radius: 12px;
+  }
+  .portrait-ph code { font-size: 11px; color: var(--accent-dark); }
+
+  /* News scrolls on its own once it outgrows a few items, so the section never
+     pushes the rest of the page down. A thin sage scrollbar hints there's more. */
+  .news {
+    list-style: none; margin: 0; padding: 0;
+    max-height: 320px; overflow-y: auto;
+    padding-right: 10px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--accent-pale) transparent;
+    overscroll-behavior: contain;
+  }
+  .news::-webkit-scrollbar { width: 6px; }
+  .news::-webkit-scrollbar-thumb { background: var(--accent-pale); border-radius: 3px; }
+  .news::-webkit-scrollbar-thumb:hover { background: var(--accent-light); }
+  .news::-webkit-scrollbar-track { background: transparent; }
+  .news li { display: grid; grid-template-columns: 88px 1fr; gap: 18px; padding: 11px 0; border-bottom: 1px dashed var(--border); font-size: .88rem; }
+  .news li:last-child { border-bottom: 0; }
+  .news time { font-variant-numeric: tabular-nums; font-size: 11px; letter-spacing: .06em; color: var(--muted-light); padding-top: 4px; }
+  .news p { margin: 0; color: var(--fg-2); font-weight: 400; }
+
+  /* No card, no pills — venue and links are set apart by weight and colour. */
+  .pub + .pub { margin-top: 26px; }
+  .pub h3 { margin: 0 0 6px; font-family: "Source Serif 4", Georgia, serif; font-size: 1.06rem; font-weight: 600; line-height: 1.4; }
+  .pub h3 a { text-decoration: none; border-bottom: 1px solid transparent; transition: color .2s, border-color .2s; }
+  .pub h3 a:hover { color: var(--accent); border-bottom-color: var(--accent-pale); }
+  .authors { margin: 0 0 7px; font-size: .84rem; font-weight: 400; color: var(--muted); }
+  .authors b { font-weight: 700; color: var(--fg-2); }
+  .authors sup { font-weight: 600; color: var(--accent); }
+  /* linked co-authors and the owner's own name share the title-link hover; the owner's isn't a link */
+  .authors a, .authors .me { text-decoration: none; border-bottom: 1px solid transparent; transition: color .2s, border-color .2s; }
+  .authors a:hover, .authors .me:hover { color: var(--accent); border-bottom-color: var(--accent-pale); }
+  /* venue in Source Serif 4; Paper·Code·Poster in IBM Plex Mono, a step smaller
+     than the body, with thin middot separators between the links only. */
+  .venue { font-family: "Source Serif 4", Georgia, serif; font-size: .84rem; font-weight: 600; letter-spacing: .01em; color: var(--accent); margin-right: 14px; }
+  .venue a { color: inherit; text-decoration: none; border-bottom: 1px solid transparent; transition: border-color .2s; }
+  .venue a:hover { border-bottom-color: var(--accent-pale); }
+  .pub-links { display: inline-flex; align-items: baseline; flex-wrap: wrap; }
+  .pub-links a {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: .74rem; font-weight: 500; letter-spacing: .01em;
+    color: var(--fg-2); text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: color .2s, border-color .2s;
+  }
+  .pub-links a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+  /* the middot is its own element, not part of any anchor, so the link and its
+     underline cover only the label text (Paper / Code / Poster). */
+  .pub-links .sep { margin: 0 9px; color: var(--muted-light); font-weight: 400; }
+  /* award label after the links: italic Source Serif 4 like the venue, in a
+     paler sage; the ☆ stays upright. */
+  .pub-links .sep--award { color: var(--award); }
+  .award { font-family: "Source Serif 4", Georgia, serif; font-style: italic; font-size: .84rem; font-weight: 600; color: var(--award); white-space: nowrap; }
+  .award .star { font-style: normal; margin-right: 3px; }
+  .pub-note { margin: 12px 0 0; font-size: .72rem; color: var(--muted-light); }
+  .pub-legend { margin-top: 23px; }
+  .pub-note sup { color: var(--accent); }
+
+  /* ongoing / in-progress work — the whole entry sits in a light grey, so it
+     reads as not-yet-published. The author's own name keeps its bold weight but
+     takes the same grey (no darker highlight). */
+  .pub--ongoing h3,
+  .pub--ongoing .authors,
+  .pub--ongoing .venue,
+  .pub--ongoing .authors b,
+  .pub--ongoing .authors sup { color: var(--muted-faint); }
+  /* tighter line spacing for not-yet-published entries */
+  .pub--ongoing { line-height: 1.05; }
+  .pub--ongoing h3 { margin-bottom: 0; line-height: 1.1; }
+  .pub--ongoing .authors { margin-bottom: 0; }
+
+  /* "Under review" toggle below the published list (native <details>); the
+     label is set like a paper title in the award colour (hint in italic), marker hidden. */
+  .pub-more { margin-top: 26px; }
+  .pub-more summary {
+    display: inline-block; list-style: none; cursor: pointer;
+    font-size: 1.05rem; font-weight: 600; line-height: 1.4; letter-spacing: -.01em;
+    color: var(--award);
+  }
+  .pub-more summary .hint { margin-left: 6px; font-size: .78rem; font-weight: 400; font-style: italic; }
+  .pub-more summary::-webkit-details-marker { display: none; }
+  .pub-more summary + .pub { margin-top: 16px; }
+  .pub-more .pub + .pub { margin-top: 4px; }
+
+  .entry { display: grid; grid-template-columns: 1fr auto; gap: 7px 22px; padding: 13px 0; border-bottom: 1px dashed var(--border); }
+  .entry:last-child { border-bottom: 0; }
+  .entry:first-of-type { padding-top: 0; }
+  .entry h3 { grid-column: 1; margin: 0; font-size: .91rem; font-weight: 600; }
+  .entry .when { grid-column: 2; grid-row: 1; font-size: 11px; letter-spacing: .05em; color: var(--muted-light); font-variant-numeric: tabular-nums; white-space: nowrap; padding-top: 3px; }
+  .entry .what { grid-column: 1 / -1; margin: 0; font-size: .85rem; font-weight: 400; color: var(--fg-2); }
+  .entry .meta { grid-column: 1 / -1; margin: 3px 0 0; font-size: .76rem; color: var(--muted); }
+
+  /* school name in Education carries the KU brand tint; its link keeps the
+     crimson on hover (only the soft underline appears), rather than turning
+     accent-green like the department links do. */
+  #eduList .entry h3 { color: var(--school); }
+  #eduList .entry h3 a:hover { color: inherit; border-bottom-color: var(--accent-pale); }
+
+  footer { padding: 28px 0 39px; border-top: 1px solid var(--border); font-size: 11px; color: var(--muted-light); display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  footer a { text-decoration: none; }
+  footer a:hover { color: var(--accent); }
+
+  /* Scroll reveal, gated on .js so text is never hidden without scripting. */
+  .js .reveal { opacity: 0; transform: translateY(18px); transition: opacity .7s cubic-bezier(.22,.9,.3,1), transform .7s cubic-bezier(.22,.9,.3,1); }
+  .js .reveal.in { opacity: 1; transform: none; }
+  @media (prefers-reduced-motion: reduce) { .js .reveal { opacity: 1; transform: none; transition: none; } }
+
+  /* ---------- section dot-rail nav ---------- *
+   * A restrained scrollspy: a dot per section on the right margin. The dot for
+   * the section in view fills sage; a very faint label slides in beside it.
+   * Hidden over the hero, it fades in once you start reading.                 */
+  section[id] { scroll-margin-top: 92px; }
+  .dotnav {
+    position: fixed; right: clamp(14px, 2.4vw, 30px); top: 50%; transform: translateY(-50%);
+    z-index: 6; display: flex; flex-direction: column; gap: 18px;
+    opacity: 0; pointer-events: none; transition: opacity .4s;
+  }
+  .dotnav.in { opacity: 1; pointer-events: auto; }
+  .dotnav a { position: relative; display: block; width: 10px; height: 10px; }
+  .dotnav a::after {
+    content: ""; position: absolute; inset: 2px; border-radius: 50%;
+    background: var(--muted-light); opacity: .45;
+    transition: background .2s, opacity .2s, inset .2s, box-shadow .2s;
+  }
+  .dotnav a:hover::after { opacity: .9; background: var(--accent); }
+  .dotnav a.active::after { opacity: 1; background: var(--accent); inset: 0; box-shadow: 0 0 0 3px rgba(94,145,126,.16); }
+  /* labels are deliberately very faint — a whisper of a cue, not a menu */
+  .dotnav a .lbl {
+    position: absolute; right: 20px; top: 50%; transform: translateY(-50%) translateX(6px);
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 10px; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--muted-light); white-space: nowrap;
+    opacity: 0; transition: opacity .2s, transform .2s; pointer-events: none;
+  }
+  .dotnav a:hover .lbl { opacity: .5; transform: translateY(-50%) translateX(0); }
+  .dotnav a.active .lbl { opacity: .3; transform: translateY(-50%) translateX(0); }
+
+  @media (max-width: 640px) {
+    .about-grid { grid-template-columns: 1fr; }
+    .portrait { max-width: 150px; margin: 0 auto; }
+    .news li { grid-template-columns: 1fr; gap: 4px; }
+    .news time { padding-top: 0; }
+    .entry { grid-template-columns: 1fr; }
+    .entry .when { grid-column: 1; grid-row: auto; }
+    .scroll-hint { display: none; }
+    .dotnav { display: none; }
+  }
+</style>
+</head>
+<body>
+<script>document.documentElement.classList.add('js');</script>
+
+<canvas id="bg" aria-hidden="true"></canvas>
+<div class="vignette" aria-hidden="true"></div>
+
+<div class="bar-bg" id="barbg" aria-hidden="true"></div>
+
+<header class="brand" id="brand">
+  <h1 class="name intro">Wonjun Choi</h1>
+  <div class="brand-extra intro">
+    <p class="affil"><a href="https://dais.korea.ac.kr/" target="_blank" rel="noreferrer"><img class="affil-logo" src="images/dais_logo_rounded_square.svg" alt="" aria-hidden="true">DAIS Lab</a> &nbsp;<em>/</em>&nbsp; <a href="https://www.korea.edu/en/index.do" target="_blank" rel="noreferrer">Korea University</a></p>
+    <div class="rule"></div>
+    <p class="tagline">Graduate student in Computer Science and Engineering
+      <span class="tagline-sub">Building adaptive AI that keeps learning from an evolving world</span></p>
+  </div>
+  <nav class="links intro">
+    <a href="https://scholar.google.com/citations?hl=en&amp;user=cXeoUaIAAAAJ&amp;view_op=list_works&amp;sortby=pubdate" target="_blank" rel="noreferrer" title="Google Scholar" aria-label="Google Scholar">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5.6 12.9 1.8 9.8 12 2.2l10.2 7.6-3.8 3.1"/><circle cx="12" cy="16.2" r="5.4"/></svg>
+    </a>
+    <!-- CV: points at the placeholder page until files/cv.pdf exists -->
+    <a href="cv.html" title="CV" aria-label="CV">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.4 2.6H6.6a2 2 0 0 0-2 2v14.8a2 2 0 0 0 2 2h10.8a2 2 0 0 0 2-2V7.6Z"/><path d="M14.2 2.8v3.4a1.6 1.6 0 0 0 1.6 1.6h3.4"/><path d="M8.6 12.6h6.8M8.6 16.4h6.8M8.6 8.8h2.4"/></svg>
+    </a>
+    <a href="https://github.com/wonjunchoi23"target="_blank" rel="noreferrer" title="GitHub" aria-label="GitHub">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 19c-4 1.4-4-2.1-6-2.6m12 5.1v-3.6a3.1 3.1 0 0 0-.9-2.4c2.9-.3 6-1.4 6-6.4a5 5 0 0 0-1.4-3.4 4.6 4.6 0 0 0-.1-3.5S17.4 1.9 15 3.5a12.2 12.2 0 0 0-6.4 0C6.2 1.9 5.2 2.2 5.2 2.2a4.6 4.6 0 0 0-.1 3.5A5 5 0 0 0 3.7 9.1c0 5 3 6.1 5.9 6.4a3.1 3.1 0 0 0-.9 2.4v3.6"/></svg>
+    </a>
+    <a href="https://x.com/wonjunchoi23" target="_blank" rel="noreferrer" title="X" aria-label="X">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4l11.733 16h4.267l-11.733 -16z"/><path d="M4 20l6.768 -6.768m2.46 -2.46l6.772 -6.772"/></svg>
+    </a>
+    <a href="https://www.linkedin.com/in/wonjun-choi-14b79b333" target="_blank" rel="noreferrer" title="LinkedIn" aria-label="LinkedIn">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2.4"/><path d="M7.6 10.4v6.4M7.6 7.3v.1M11.6 16.8v-3.9a2.4 2.4 0 0 1 4.8 0v3.9"/></svg>
+    </a>
+    <a href="mailto:migreeni@korea.ac.kr" title="Email" aria-label="Email">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.6" y="5" width="18.8" height="14" rx="2.2"/><path d="m3.2 7.2 8.8 5.9 8.8-5.9"/></svg>
+    </a>
+  </nav>
+</header>
+
+<a class="scroll-hint intro" href="#about">Scroll<i></i></a>
+
+<!-- Section dot-rail nav. Lists the visible sections; Awards is hidden, so it
+     is left out until that section is shown. -->
+<nav class="dotnav" id="dotnav" aria-label="Sections">
+  <a href="#about" data-sec="about"><span class="lbl">About</span></a>
+  <a href="#news" data-sec="news"><span class="lbl">News</span></a>
+  <a href="#publications" data-sec="publications"><span class="lbl">Publications</span></a>
+  <a href="#education" data-sec="education"><span class="lbl">Education</span></a>
+</nav>
+
+<main id="top">
+  <div class="hero-spacer" id="spacer"></div>
+
+  <div class="sheet">
+
+    <!-- Section bodies are rendered from content.js — edit that file, not this one. -->
+
+    <section id="about" class="reveal">
+      <h2>About</h2>
+      <div class="about-grid">
+        <figure class="portrait" id="portrait"></figure>
+        <div class="about-text" id="aboutText"></div>
+      </div>
+    </section>
+
+    <section id="news" class="reveal">
+      <h2>News</h2>
+      <ul class="news" id="newsList"></ul>
+    </section>
+
+    <section id="publications" class="reveal">
+      <h2>Publications</h2>
+      <div id="pubList"></div>
+    </section>
+
+    <section id="education" class="reveal">
+      <h2>Education</h2>
+      <div id="eduList"></div>
+    </section>
+
+    <!-- Awards are in content.js but kept off the page for now.
+         Delete the `hidden` attribute below to show the section. -->
+    <section id="awards" class="reveal" hidden>
+      <h2>Awards</h2>
+      <div id="awardList"></div>
+    </section>
+
+    <footer>
+      <span>© 2026 Wonjun Choi · <a href="mailto:migreeni@korea.ac.kr">migreeni (at) korea.ac.kr</a></span>
+      <span>Korea University · <a href="https://dais.korea.ac.kr/" target="_blank" rel="noreferrer">DAIS Lab</a></span>
+    </footer>
+
+  </div>
+</main>
+
+<script src="content.js"></script>
+<script>
+/* Render every section body from content.js. Adding a publication or a news
+   item means editing that file only — nothing here needs to change. */
+(() => {
+  const S = window.SITE;
+  if (!S) return;
+
+  const el = (id) => document.getElementById(id);
+  const set = (id, html) => { const n = el(id); if (n) n.innerHTML = html; };
+
+  const ext = (url) => /^https?:/.test(url) ? ' target="_blank" rel="noreferrer"' : '';
+
+  /* trailing *, † and ‡ become superscripts; your own name is bolded and every
+     name listed in SITE.people becomes a link. Names are matched in one pass so
+     inserted markup is never rescanned. */
+  const people = S.people || {};
+  const esc = (n) => n.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const nameRe = new RegExp(
+    [S.me, ...Object.keys(people)].filter(Boolean).sort((a, b) => b.length - a.length).map(esc).join('|'),
+    'g');
+  const authors = (s) => s
+    .replace(/([*†‡])/g, '<sup>$1</sup>')
+    .replace(nameRe, (n) => n === S.me
+      ? `<b class="me">${n}</b>`
+      : `<a href="${people[n]}"${ext(people[n])}>${n}</a>`);
+
+  // ---- about
+  set('aboutText', S.about.paragraphs.map(p => `<p class="lead">${p}</p>`).join(''));
+
+  const fig = el('portrait');
+  if (fig && S.about.photo) {
+    const img = new Image();
+    img.src = S.about.photo;
+    img.alt = S.about.photoAlt || '';
+    img.addEventListener('error', () => {
+      fig.innerHTML = `<div class="portrait-ph"><span>Add your photo at<br><code>${S.about.photo}</code></span></div>`;
+    });
+    fig.appendChild(img);
+  }
+
+  // ---- news
+  set('newsList', S.news.map(n =>
+    `<li><time>${n.date}</time><p>${n.html}</p></li>`).join(''));
+
+  // ---- publications
+  // published papers are listed directly; `ongoing` ones fold into an
+  // "Under review" toggle below them.
+  const pub = p => `
+    <article class="pub${p.ongoing ? ' pub--ongoing' : ''}">
+      <h3>${p.url ? `<a href="${p.url}"${ext(p.url)}>${p.title}</a>` : p.title}</h3>
+      <p class="authors">${authors(p.authors)}</p>
+      ${p.venue ? `<span class="venue">${p.venue}</span>` : ''}
+      <span class="pub-links">${(p.links || []).map(l =>
+        `<a href="${l.url}"${ext(l.url)}>${l.label}</a>`).join('<span class="sep">·</span>')}${p.award
+        ? `${p.links && p.links.length ? '<span class="sep sep--award">|</span>' : ''}<span class="award"><span class="star">☆</span>${p.award}</span>`
+        : ''}</span>
+    </article>`;
+  const done = S.publications.filter(p => !p.ongoing);
+  const review = S.publications.filter(p => p.ongoing);
+  set('pubList', done.map(pub).join('')
+    + (review.length ? `
+    <details class="pub-more">
+      <summary>Under review<span class="hint">(click to expand)</span></summary>
+      ${review.map(pub).join('')}
+    </details>` : '')
+    + (S.pubLegend ? `<p class="pub-note pub-legend">${authors(S.pubLegend)}</p>` : ''));
+
+  // ---- education / awards share a shape
+  const entries = (list) => list.map(e => `
+    <div class="entry">
+      <h3>${e.orgUrl ? `<a href="${e.orgUrl}"${ext(e.orgUrl)}>${e.org}</a>` : e.org}</h3>
+      <span class="when">${e.when}</span>
+      <p class="what">${e.what}</p>
+      ${e.meta ? `<p class="meta">${e.meta}</p>` : ''}
+    </div>`).join('');
+
+  set('eduList', entries(S.education));
+  set('awardList', entries(S.awards));
+})();
+</script>
+
+<script>
+(() => {
+  const canvas = document.getElementById('bg');
+  const ctx = canvas.getContext('2d');
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* sage-green palette, matched to the DAIS Lab site */
+  const NODE = '64, 86, 77';
+  const ACC  = '78, 137, 114';
+
+  let W = 0, H = 0;
+  const pointer = { x: -9999, y: -9999, active: false };
+
+  const lerp = (a, b, t) => a + (b - a) * t;
+  const clamp01 = (v) => Math.min(Math.max(v, 0), 1);
+
+  /* ---------- collapsing header ---------- */
+  const brand   = document.getElementById('brand');
+  const nameEl  = brand.querySelector('.name');
+  const extraEl = brand.querySelector('.brand-extra');
+  const linksEl = brand.querySelector('.links');
+  const barBg   = document.getElementById('barbg');
+  const spacer  = document.getElementById('spacer');
+  const hint    = document.querySelector('.scroll-hint');
+
+  /* The intro keyframes fill forwards, which would keep overriding the
+     scroll-driven transform/opacity set below. Drop the class once it lands. */
+  const intros = document.querySelectorAll('.intro');
+  const dropIntro = () => intros.forEach(el => el.classList.remove('intro'));
+  intros.forEach(el => el.addEventListener('animationend', () => el.classList.remove('intro'), { once: true }));
+  setTimeout(dropIntro, 2400);   // in case animationend never lands
+
+  const SMALL = 45;                       // collapsed name size, px
+  const PIN_TOP = 31;                     // gap above the name once pinned
+  let bigPx = 74, extraH = 0, padTop0 = 240, barH = 80, collapse = 1, prog = 0;
+
+  /* Paint the header at progress v (0 = full hero, 1 = pinned bar).
+     Returns the bar backdrop's alpha, which the canvas reuses. */
+  function paint(v) {
+    nameEl.style.fontSize = lerp(bigPx, SMALL, v) + 'px';
+    nameEl.style.letterSpacing = lerp(-0.045 * bigPx, -0.02 * SMALL, v) + 'px';
+
+    extraEl.style.opacity = clamp01(1 - v * 2.2);
+    extraEl.style.height = lerp(extraH, 0, clamp01(v * 1.5)) + 'px';
+
+    linksEl.style.marginTop = lerp(27, 8, v) + 'px';
+    linksEl.style.transform = 'scale(' + lerp(1, 0.88, v) + ')';
+
+    brand.style.paddingTop = lerp(padTop0, PIN_TOP, v) + 'px';
+    brand.style.paddingBottom = lerp(0, 16, v) + 'px';
+
+    const barA = clamp01((v - 0.62) / 0.38);
+    barBg.style.opacity = barA;
+    if (hint) hint.style.opacity = clamp01(1 - v * 4);
+    return barA;
+  }
+
+  function measureHeader() {
+    bigPx = Math.min(Math.max(W * 0.063, 37), 90);
+
+    // natural sizes, measured with the header fully expanded and unpadded
+    extraEl.style.height = 'auto';
+    extraEl.style.opacity = '1';
+    nameEl.style.fontSize = bigPx + 'px';
+    nameEl.style.letterSpacing = (-0.045 * bigPx) + 'px';
+    linksEl.style.marginTop = '27px';
+    linksEl.style.transform = 'none';
+    brand.style.paddingTop = '0px';
+    brand.style.paddingBottom = '0px';
+
+    extraH = extraEl.offsetHeight;
+    padTop0 = Math.max((H - brand.offsetHeight) / 2, 24);
+
+    paint(1);
+    barH = brand.offsetHeight;
+    barBg.style.height = (barH + 22) + 'px';   // +22 so the fade sits clear of the icons
+
+    /* Pin the spacer to innerHeight rather than leaving it at 100svh: the two
+       disagree on mobile, and the sheet has to clear exactly the distance we
+       collapse over so its top edge meets the bar at progress 1. */
+    spacer.style.height = H + 'px';
+    collapse = Math.max(H - barH, 1);
+  }
+
+  /* ---------- graph clearance ---------- *
+   * The header text is faded out of an ellipse in the canvas. The ellipse
+   * tracks the header as it collapses, and switches off once the bar's own
+   * backdrop is opaque enough to do the job.                                */
+  let clearCY = 0, clearRX = 560, clearRY = 250, clearStrength = 1;
+
+  function clearance(x, y) {
+    if (clearStrength <= 0.001) return 1;
+    const nx = (x - W / 2) / clearRX;
+    const ny = (y - clearCY) / clearRY;
+    const d = Math.hypot(nx, ny);
+    const f = clamp01((d - 0.62) / 0.7);
+    return f + (1 - f) * (1 - clearStrength);
+  }
+
+  /* ---------- organic graph ---------- *
+   * Nodes drift; an edge exists wherever two are close enough. Activations
+   * travel along those edges and re-emit on arrival, so the mesh keeps a low,
+   * steady pulse of traffic across it.                                       */
+  const graph = {
+    nodes: [], pulses: [], LINK: 165, spawnAcc: 0, lastPoke: -1,
+
+    init() {
+      const count = Math.round(Math.min(Math.max((W * H) / 12500, 55), 150));
+      this.LINK = W < 700 ? 125 : 172;
+      this.nodes = Array.from({ length: count }, () => ({
+        x: Math.random() * W, y: Math.random() * H,
+        vx: (Math.random() - .5) * .34, vy: (Math.random() - .5) * .34,
+        r: Math.random() * 1.6 + 1.5,
+        act: 0,
+      }));
+      this.pulses = [];
+    },
+
+    neighbours(i) {
+      const ns = this.nodes, L2 = this.LINK * this.LINK, out = [];
+      for (let j = 0; j < ns.length; j++) {
+        if (j === i) continue;
+        const dx = ns[i].x - ns[j].x, dy = ns[i].y - ns[j].y;
+        if (dx * dx + dy * dy < L2) out.push(j);
+      }
+      return out;
+    },
+
+    fire(i) {
+      this.nodes[i].act = 1;
+      if (this.pulses.length > 90) return;
+      const nb = this.neighbours(i);
+      if (!nb.length) return;
+      const take = Math.min(nb.length, 1 + (Math.random() < 0.35 ? 1 : 0));
+      for (let k = 0; k < take; k++) {
+        const b = nb[Math.floor(Math.random() * nb.length)];
+        this.pulses.push({ a: i, b, t: 0, sp: 0.014 + Math.random() * 0.012 });
+      }
+    },
+
+    step(dt) {
+      const speed = reduced ? .25 : 1;
+      const ns = this.nodes;
+
+      for (const n of ns) {
+        n.x += n.vx * dt * speed;
+        n.y += n.vy * dt * speed;
+        if (n.x < 0 || n.x > W) n.vx *= -1;
+        if (n.y < 0 || n.y > H) n.vy *= -1;
+        n.x = Math.min(Math.max(n.x, 0), W);
+        n.y = Math.min(Math.max(n.y, 0), H);
+        n.act *= Math.pow(0.962, dt);
+
+        if (pointer.active) {
+          const dx = n.x - pointer.x, dy = n.y - pointer.y, d = Math.hypot(dx, dy);
+          if (d < 135 && d > .01) {
+            const push = (1 - d / 135) * .55;
+            n.x += (dx / d) * push * dt;
+            n.y += (dy / d) * push * dt;
+          }
+        }
+      }
+
+      this.spawnAcc += dt * speed;
+      if (this.spawnAcc > 22) {
+        this.spawnAcc = 0;
+        this.fire(Math.floor(Math.random() * ns.length));
+      }
+
+      if (pointer.active) {
+        let best = -1, bestD = 46 * 46;
+        for (let i = 0; i < ns.length; i++) {
+          const d2 = (ns[i].x - pointer.x) ** 2 + (ns[i].y - pointer.y) ** 2;
+          if (d2 < bestD) { bestD = d2; best = i; }
+        }
+        if (best >= 0 && best !== this.lastPoke) { this.fire(best); this.lastPoke = best; }
+        if (best < 0) this.lastPoke = -1;
+      }
+
+      const snapL2 = (this.LINK * 1.5) ** 2;
+      for (let i = this.pulses.length - 1; i >= 0; i--) {
+        const p = this.pulses[i];
+        const a = ns[p.a], b = ns[p.b];
+        // the edge is transient — drop the pulse if its two nodes drift apart
+        if ((a.x - b.x) ** 2 + (a.y - b.y) ** 2 > snapL2) { this.pulses.splice(i, 1); continue; }
+        p.t += p.sp * dt * speed;
+        if (p.t >= 1) {
+          this.pulses.splice(i, 1);
+          if (Math.random() < 0.62) this.fire(p.b);
+          else b.act = 1;
+        }
+      }
+    },
+
+    draw() {
+      const ns = this.nodes, L = this.LINK, L2 = L * L;
+
+      for (let i = 0; i < ns.length; i++) {
+        for (let j = i + 1; j < ns.length; j++) {
+          const dx = ns[i].x - ns[j].x, dy = ns[i].y - ns[j].y;
+          const d2 = dx * dx + dy * dy;
+          if (d2 > L2) continue;
+          const f = clearance((ns[i].x + ns[j].x) / 2, (ns[i].y + ns[j].y) / 2);
+          if (f <= 0.01) continue;
+          const near = 1 - Math.sqrt(d2) / L;
+          const hot = Math.max(ns[i].act, ns[j].act);
+          if (hot > 0.05) {
+            ctx.strokeStyle = `rgba(${ACC},${(0.12 + hot * 0.4) * near * f})`;
+            ctx.lineWidth = 1 + hot * 0.6;
+          } else {
+            ctx.strokeStyle = `rgba(${NODE},${0.52 * near * f})`;
+            ctx.lineWidth = 1;
+          }
+          ctx.beginPath();
+          ctx.moveTo(ns[i].x, ns[i].y);
+          ctx.lineTo(ns[j].x, ns[j].y);
+          ctx.stroke();
+        }
+      }
+
+      for (const p of this.pulses) {
+        const a = ns[p.a], b = ns[p.b];
+        const x = a.x + (b.x - a.x) * p.t;
+        const y = a.y + (b.y - a.y) * p.t;
+        const f = clearance(x, y);
+        if (f <= 0.01) continue;
+        const tt = Math.max(p.t - 0.18, 0);
+        const g = ctx.createLinearGradient(a.x + (b.x - a.x) * tt, a.y + (b.y - a.y) * tt, x, y);
+        g.addColorStop(0, `rgba(${ACC},0)`);
+        g.addColorStop(1, `rgba(${ACC},${0.55 * f})`);
+        ctx.strokeStyle = g;
+        ctx.lineWidth = 1.7;
+        ctx.beginPath();
+        ctx.moveTo(a.x + (b.x - a.x) * tt, a.y + (b.y - a.y) * tt);
+        ctx.lineTo(x, y);
+        ctx.stroke();
+
+        ctx.fillStyle = `rgba(${ACC},${0.95 * f})`;
+        ctx.beginPath();
+        ctx.arc(x, y, 2.1, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      for (const n of ns) {
+        const f = clearance(n.x, n.y);
+        if (f <= 0.01) continue;
+        if (n.act > 0.05) {
+          ctx.fillStyle = `rgba(${ACC},${0.15 * n.act * f})`;
+          ctx.beginPath();
+          ctx.arc(n.x, n.y, n.r + 10 * n.act, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.fillStyle = n.act > 0.05
+          ? `rgba(${ACC},${(0.5 + n.act * 0.45) * f})`
+          : `rgba(${NODE},${0.75 * f})`;
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, n.r + n.act * 1.5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    },
+  };
+
+  function onScroll() {
+    prog = clamp01(window.scrollY / collapse);
+    const barA = paint(prog);
+    clearStrength = 1 - barA;
+    clearCY = lerp(H / 2, barH / 2, prog);
+    const rx = Math.min(W * 0.42, 580);
+    clearRX = lerp(rx, rx * 0.5, prog);
+    clearRY = lerp(Math.min(H * 0.40, 260), barH * 0.85, prog);
+  }
+
+  function resize() {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = window.innerWidth;
+    H = window.innerHeight;
+    canvas.width = Math.round(W * dpr);
+    canvas.height = Math.round(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    measureHeader();
+    onScroll();
+    graph.init();
+  }
+
+  let last = performance.now();
+  let running = true;
+  function frame(now) {
+    const dt = Math.min((now - last) / 16.67, 3);
+    last = now;
+    ctx.clearRect(0, 0, W, H);
+    graph.step(dt);
+    graph.draw();
+    if (running) requestAnimationFrame(frame);
+  }
+
+  // don't burn battery on a hidden tab
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) running = false;
+    else if (!running) { running = true; last = performance.now(); requestAnimationFrame(frame); }
+  });
+
+  /* Mobile browsers fire resize every time the URL bar slides away. Re-laying
+     out on that would make the header jump mid-scroll, so ignore height-only
+     changes that are small enough to be chrome appearing. */
+  window.addEventListener('resize', () => {
+    if (window.innerWidth === W && Math.abs(window.innerHeight - H) < 130) return;
+    resize();
+  });
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('pointermove', (e) => {
+    pointer.x = e.clientX; pointer.y = e.clientY; pointer.active = true;
+  });
+  window.addEventListener('pointerleave', () => { pointer.active = false; });
+
+  // reveal sections as they come into view
+  const revealables = document.querySelectorAll('.reveal');
+  const revealAll = () => revealables.forEach(el => el.classList.add('in'));
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver((entries) => {
+      for (const e of entries) {
+        if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+      }
+    }, { rootMargin: '0px 0px -12% 0px' });
+    revealables.forEach(el => io.observe(el));
+    setTimeout(revealAll, 2500);   // never leave text stuck at opacity 0
+  } else {
+    revealAll();
+  }
+
+  resize();
+  requestAnimationFrame(frame);
+  // the header is measured from rendered text, so re-measure once the web font lands
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(() => { measureHeader(); onScroll(); });
+  }
+})();
+</script>
+
+<script>
+/* Dot-rail nav: fade in once you scroll past the hero, and light up the dot
+   for whichever section is currently centred in the viewport. */
+(() => {
+  const nav = document.getElementById('dotnav');
+  if (!nav) return;
+  const links = nav.querySelectorAll('a[data-sec]');
+  const setActive = (id) => links.forEach(a => a.classList.toggle('active', a.dataset.sec === id));
+
+  const onScroll = () => nav.classList.toggle('in', window.scrollY > window.innerHeight * 0.45);
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) setActive(e.target.id); });
+    }, { rootMargin: '-45% 0px -45% 0px' });
+    document.querySelectorAll('main section[id]:not([hidden])').forEach(s => io.observe(s));
+  }
+})();
+</script>
+<script data-goatcounter="https://wonjunchoi23.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
+</body>
+</html>
